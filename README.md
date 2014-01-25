@@ -26,3 +26,9 @@ Propeller uses requestAnimationFrame and GPU compositing for better performance.
 ##Public properties
 - **angle** current propellers angle.
 - **speed** current speed of rotation. Degrees per frame.
+
+##License
+
+MIT: http://rem.mit-license.org
+
+Copyright 2014 Denis Radin aka (PixelsCommander)[http://pixelscommander.com]
