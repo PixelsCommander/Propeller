@@ -1,3 +1,21 @@
+/*!
+ *                          . .
+ *                          | |            o
+ *      ;-. ;-. ,-. ;-. ,-. | | ,-. ;-.    , ,-.
+ *      | | |   | | | | |-' | | |-' |      | `-.
+ *      |-' '   `-' |-' `-' ' ' `-' '   o  | `-'
+ *      '           '                     -'
+ *
+ *      http://pixelscommander.com/polygon/propeller/example/
+ *      jQuery plugin to rotate HTML elements by mouse. With inertia or without it.
+ *
+ *      Copyright (c) 2014 Denis Radin
+ *      Licensed under the MIT license.
+ *
+ *      Title generated using "speed" http://patorjk.com/software/taag/#p=display&f=Shimrod&t=propeller.js
+ *      Inspired by Brian Gonzalez
+ */
+
 ;(function (w) {
 
     var jqPluginName = 'propeller';
