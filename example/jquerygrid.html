@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Rotate HTML elements by mouse in JavaScript - Propeller.js</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/turbine.css">
+</head>
+<body>
+<div class="examples_wrapper">
+    <h1>Propeller.js examples</h1>
+    <table>
+        <tr>
+            <td class="example">
+                <p>
+                    $('#example1').propeller({inertia: 1, speed: 1});
+                </p>
+                <img class="turbine" width="100%" height="auto" id="example1" src="./img/turbine.png">
+            </td>
+            <td class="example">
+                <p>
+                    $('#example2').propeller({inertia: 0.99, speed: 0});
+                </p>
+                <img class="turbine" width="100%" height="auto" id="example2" src="./img/turbine.png">
+            </td>
+            <td class="example">
+                <p>
+                    $('#example3').propeller({inertia: 0, speed: 0});
+                </p>
+                <img class="turbine" width="100%" height="auto" id="example3" src="./img/turbine.png">
+            </td>
+        </tr>
+        <tr>
+            <td class="example">
+                <p>
+                    $('#example4').propeller({inertia: 1, speed: 0, step: 30});
+                </p>
+                <img class="turbine" width="100%" height="auto" id="example4" src="./img/turbine.png">
+            </td>
+            <td class="example">
+                <p>
+                    $('#example5').propeller({inertia: 0.99, speed: 0, step: 10});
+                </p>
+                <img class="turbine" width="100%" height="auto" id="example5" src="./img/turbine.png">
+            </td>
+            <td class="example">
+                <p>
+                    $('#example6').propeller({inertia: 0, speed: 0, step: 45});
+                </p>
+                <img class="turbine" width="100%" height="auto" id="example6" src="./img/turbine.png">
+            </td>
+        </tr>
+        <!--<tr>
+            <td class="example">
+                <p>
+                    $('#example7').propeller({inertia: 1, speed: 0, step: 30, stepTransitionTime: 300});
+                </p>
+                <img class="turbine" width="100%" height="auto" id="example7" src="./img/turbine.png">
+            </td>
+            <td class="example">
+                <p>
+                    $('#example8').propeller({inertia: 0.99, speed: 0, step: 10, stepTransitionTime: 300});
+                </p>
+                <img class="turbine" width="100%" height="auto" id="example8" src="./img/turbine.png">
+            </td>
+            <td class="example">
+                <p>
+                    $('#example9').propeller({inertia: 0, speed: 0, step: 45, stepTransitionTime: 300});
+                </p>
+                <img class="turbine" width="100%" height="auto" id="example9" src="./img/turbine.png">
+            </td>
+        </tr>-->
+    </table>
+</div>
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="../src/propeller.js"></script>
+<script>
+    $('#example1').propeller({inertia: 1, speed: 1});
+    $('#example2').propeller({inertia: 0.99, speed: 0});
+    $('#example3').propeller({inertia: 0, speed: 0});
+    $('#example4').propeller({inertia: 1, speed: 0, step: 30});
+    $('#example5').propeller({inertia: 0.99, speed: 0, step: 10});
+    $('#example6').propeller({inertia: 0, speed: 0, step: 45});
+    /*$('#example7').propeller({inertia: 1, speed: 0, step: 30, stepTransitionTime: 300, stepTransitionEasing: 'ease-in-out'});
+    $('#example8').propeller({inertia: 0.99, speed: 0, step: 10, stepTransitionTime: 300, stepTransitionEasing: 'ease-in'});
+    $('#example9').propeller({inertia: 0, speed: 0, step: 45, stepTransitionTime: 300, stepTransitionEasing: 'ease-out'});*/
+</script>
+</body>
+</html>

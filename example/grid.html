@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Rotate HTML elements by mouse in JavaScript - Propeller.js</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/turbine.css">
+</head>
+<body>
+<table>
+    <tr>
+        <td class="example">
+            <h3>
+                Inertia = 0
+            </h3>
+            <img width="100%" height="auto" id="example1" src="./img/turbine.png">
+        </td>
+        <td class="example">
+            <h3>
+                Inertia = 0.99
+            </h3>
+            <img width="100%" height="auto" id="example2" src="./img/turbine.png">
+        </td>
+        <td class="example">
+            <h3>
+                Inertia = 1 (Infinite rotation)
+            </h3>
+            <img width="100%" height="auto" id="example3" src="./img/turbine.png">
+        </td>
+    </tr>
+</table>
+<script src="../src/propeller.js"></script>
+<script>
+    new Propeller(document.getElementById('example1'), {inertia: 0});
+    new Propeller(document.getElementById('example2'), {inertia: 0.99});
+    new Propeller(document.getElementById('example3'), {inertia: 1});
+</script>
+</body>
+</html>
