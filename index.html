@@ -4,11 +4,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Rotate HTML elements by mouse in JavaScript - Propeller.js</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/normalize.css">
-    <link rel="stylesheet" href="css/turbine.css">
+    <link rel="stylesheet" href="example/css/normalize.css">
+    <link rel="stylesheet" href="example/css/turbine.css">
 </head>
 <body style="overflow: hidden;">
-<img id="turbine" src="./img/turbine.png" onmousedown="showLibraryInfo()" ontouchstart="showLibraryInfo()">
+<img id="turbine" src="example/img/turbine.png" onmousedown="showLibraryInfo()" ontouchstart="showLibraryInfo()">
 
 <div class="content">
     <h1 class="propeller">
@@ -34,19 +34,19 @@
             rotation after mouse was released. 1 means infinite rotation. For this demo we use inertia equals to 0.99
         </li>
     </ul>
-    <a class="propeller" href="./jquerygrid.html">More examples</a>
+    <a class="propeller" href="example/jquerygrid.html">More examples</a>
     <a class="propeller" href="http://pixelscommander.com/en/propeller-rotate-html-elements-with-mouse/">Documentation</a>
     <a class="propeller" href="http://pixelscommander.com/polygon">Download</a>
-    <a class="propeller" href="http://pixelscommander.com">GitHub</a>
+    <a class="propeller" href="https://github.com/PixelsCommander/Propeller">GitHub</a>
 </div>
 <div class="arrow">
-    <img src="./img/arrow.png">
+    <img src="example/img/arrow.png">
 
     <p>
         Drag or swipe propeller
     </p>
 </div>
-<script src="../src/propeller.js"></script>
+<script src="src/propeller.js"></script>
 <script>
     new Propeller(document.getElementById('turbine'), {inertia: 0.99});
 

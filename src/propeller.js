@@ -1,23 +1,4 @@
-/*
- *                          . .
- *                          | |            o
- *      ;-. ;-. ,-. ;-. ,-. | | ,-. ;-.    , ,-.
- *      | | |   | | | | |-' | | |-' |      | `-.
- *      |-' '   `-' |-' `-' ' ' `-' '   o  | `-'
- *      '           '                     -'
- *
- *      http://pixelscommander.com/polygon/propeller/example/
- *      jQuery plugin to rotate HTML elements by mouse. With inertia or without it.
- *
- *      Copyright (c) 2014 Denis Radin
- *      Licensed under the MIT license.
- *
- *      Title generated using "speed" http://patorjk.com/software/taag/#p=display&f=Shimrod&t=propeller.js
- *      Inspired by Brian Gonzalez
- */
-
-;
-(function (w) {
+;(function (w) {
 
     var jqPluginName = 'propeller';
 
@@ -34,8 +15,6 @@
 
     var Propeller = function (element, options) {
 
-        options = options || defaults;
-
         if (typeof element === 'string') {
             element = document.querySelectorAll(element);
         }
@@ -47,29 +26,13 @@
         this.element = element;
         this.active = false;
         this.transiting = false;
-
         this.update = this.update.bind(this);
 
-        this.step = options.step || defaults.step;
-        this.stepTransitionTime = options.stepTransitionTime || defaults.stepTransitionTime;
-        this.stepTransitionEasing = options.stepTransitionEasing || defaults.stepTransitionEasing;
-
-        this.speed = options.speed || defaults.speed;
-        this.inertia = options.inertia || defaults.inertia;
-        this.minimalInertia = options.minimalInertia || defaults.minimalInertia;
-        this.lastAppliedAngle = this.virtualAngle = this.angle = options.angle || defaults.angle;
-        this.minimalAngleChange = this.step !== defaults.step ? this.step : defaults.minimalAngleChange;
-
-
-
+        this.initOptions(options);
         this.initHardwareAcceleration();
         this.initTransition();
         this.addListeners();
         this.update();
-
-        /*setInterval((function () {
-            console.log('Angle: ' + this.angle + ', speed: ' + this.speed);
-        }).bind(this), 500);*/
     };
 
     Propeller.createMany = function (nodes, options) {
@@ -84,43 +47,36 @@
 
     p.addListeners = function () {
         this.element.addEventListener('mousedown', this.onRotationStart.bind(this));
-        this.element.addEventListener('mousemove', this.onRotate.bind(this));
+        this.element.addEventListener('mousemove', this.onRotated.bind(this));
         this.element.addEventListener('mouseup', this.onRotationStop.bind(this));
         this.element.addEventListener('mouseleave', this.onRotationStop.bind(this));
         this.element.addEventListener('dragstart', this.returnFalse);
         this.element.ondragstart = this.returnFalse;
     }
 
-    p.returnFalse = function () {
-        return false;
-    }
-
     p.onRotationStart = function (event) {
         //Initializes coordinates if object was moved
         this.initCoordinates();
+        this.initDrag();
         this.active = true;
     }
 
     p.onRotationStop = function () {
-        //this.lastAppliedAngle = this.virtualAngle = this.angle;
         this.active = false;
     }
 
-    p.onRotate = function (event) {
+    p.onRotated = function (event) {
         if (this.active === true) {
-            var oldAngle = this.angleDiff;
-
-            this.updateAngleToMouse(event);
-
-            if (this.active === true) {
-                var newAngle = this.angleDiff;
-                this.speed = this.differenceBetweenAngles(newAngle, oldAngle);//oldAngle - newAngle;
-                //console.log('newAngle: ' + newAngle + ', oldAngle:' + oldAngle + ', speed: ' + this.speed);
-            }
+            this.lastMouseEvent = event;
         }
     }
 
     p.update = function () {
+        //Calculating angle on requestAnimationFrame only allows to avoid executing this when unnecessary
+        if (this.lastMouseEvent !== undefined && this.active === true) {
+            this.updateAngleToMouse(this.lastMouseEvent);
+        }
+
         this.updateAngle();
         this.applySpeed();
         this.applyInertia();
@@ -131,13 +87,15 @@
 
     p.updateCSSRotate = function () {
         if (Math.abs(this.lastAppliedAngle - this.angle) >= this.minimalAngleChange && this.transiting === false) {
-            if (this.step > 0) {
-                console.log('Transiting from: ' + this.lastAppliedAngle + ' to ' + this.angle + '. Diff was: ' + this.angleDiff);
-            }
             this.element.style[Propeller.cssPrefix + 'transform'] = 'rotate(' + this.angle + 'deg) translateZ(0)';
             this.lastAppliedAngle = this.angle;
-            //Prevent new transition before old is completed
+
+            //Prevents new transition before old is completed
             this.blockTransition();
+
+            if (this.onRotate !== undefined && typeof this.onRotate === 'function') {
+                this.onRotate.bind(this)();
+            }
         }
     }
 
@@ -150,32 +108,16 @@
     }
 
     p.getAngleFromVirtual = function () {
-        //Нужно получать актуальный дифф и на него изменять
         return Math.ceil(this.virtualAngle / this.step) * this.step;
     }
 
-    p.fixNewAngle = function (newAngle, oldAngle) {
-        var aR;
-        var nR = newAngle;
-        rot = oldAngle || 0; // if rot undefined or 0, make 0, else rot
-        aR = rot % 360;
-        if ( aR < 0 ) { aR += 360; }
-        if ( aR < 180 && (nR >= (aR + 180)) ) { rot -= 360; }
-        if ( aR >= 180 && (nR < (aR - 180)) ) { rot += 360; }
-        rot += (nR - aR);
-
-        return rot;
-    }
-
     p.differenceBetweenAngles = function (newAngle, oldAngle) {
-        var aR;
-        var nR = newAngle;
-        rot = oldAngle || 0; // if rot undefined or 0, make 0, else rot
-        aR = rot % 360;
-        if ( aR < 0 ) { aR += 360; }
-        if ( aR < 180 && (nR >= (aR + 180)) ) { rot -= 360; }
-        if ( aR >= 180 && (nR < (aR - 180)) ) { rot += 360; }
-        return nR - aR;
+        if (newAngle >= 180 && oldAngle < 180) {
+            newAngle = 360 - newAngle;
+        } else if (newAngle <= 180 && oldAngle > 180) {
+            oldAngle = 360 - oldAngle;
+        }
+        return newAngle - oldAngle;
     }
 
     p.applySpeed = function () {
@@ -186,7 +128,7 @@
 
     p.applyInertia = function () {
         if (this.inertia > 0) {
-            if (Math.abs(this.speed) > 0.001) {
+            if (Math.abs(this.speed) > this.minimalInertia) {
                 this.speed = this.speed * this.inertia;
             } else {
                 this.speed = 0;
@@ -197,44 +139,58 @@
     p.updateAngleToMouse = function (event) {
         var xDiff = event.pageX - this.cx;
         var yDiff = event.pageY - this.cy;
-        var radians = Math.atan2(xDiff, yDiff);
-        this.mouseDegrees = radians * (180 / Math.PI * -1) + 180;
-
+        var mouseRadians = Math.atan2(xDiff, yDiff);
+        var mouseDegrees = mouseRadians * (180 / Math.PI * -1) + 180;
 
         if (this.lastMouseAngle === undefined) {
             this.lastElementAngle = this.virtualAngle;
-            this.lastMouseAngle = this.mouseDegrees;
+            this.lastMouseAngle = mouseDegrees;
         }
 
-        //Здесь нужно не простое умножение / деление, а кратчайшее расстояние между
-        this.angleDiff = this.differenceBetweenAngles(this.mouseDegrees, this.lastMouseAngle)//degrees - this.lastMouseAngle;
-
-        if (this.angleDiff < 0) {
-            this.angleDiff = 360 + this.angleDiff;
+        //At this moment we have to use specific algorithm when CSS transition is enabled. Using same approach when transition is disabled lead to worse precision.
+        //TODO Develop universal algorithm to support transitions and allow good precision at once
+        if (this.stepTransitionTime !== defaults.stepTransitionTime) {
+            this.speed = this.mouseDiff = this.differenceBetweenAngles(mouseDegrees, this.lastMouseAngle);
+            this.virtualAngle = this.lastElementAngle + this.mouseDiff;
+            this.lastElementAngle = this.virtualAngle;
+            this.lastMouseAngle = mouseDegrees;
+            //console.log('this.lastMouseAngle ' + this.lastMouseAngle + ', mouseDegrees ' + mouseDegrees + ', this.mouseDiff ' + this.mouseDiff);
+        } else {
+            var oldAngle = this.virtualAngle;
+            this.mouseDiff = mouseDegrees - this.lastMouseAngle;
+            this.virtualAngle = this.lastElementAngle + this.mouseDiff;
+            var newAngle = this.virtualAngle;
+            this.speed = this.differenceBetweenAngles(newAngle, oldAngle);
         }
-
-        //this.oldAngleDiff = this.angleDiff || 0;
-        //this.angleDiff = this.differenceBetweenAngles(degrees, this.lastMouseAngle);
-        //var newAngleDiff = this.differenceBetweenAngles(this.angleDiff, this.oldAngleDiff);
-
-        //console.log('degrees: ' + degrees + ', lastMouseAngle: ' + this.lastMouseAngle + 'this.angleDiff: ' + this.angleDiff);
-
-        //console.log('this.oldAngleDiff: ' + this.oldAngleDiff + ', this.angleDiff: ' + this.angleDiff + ', newAngleDiff: ' + newAngleDiff + ' , ');
-
-        var newAngle = this.lastElementAngle + this.angleDiff;
-
-        this.virtualAngle = newAngle;//this.virtualAngle + newAngleDiff;//this.fixNewAngle(newAngle, this.virtualAngle);
     }
 
     p.initCoordinates = function () {
-        this.speed = 0;
-
         var elementOffset = this.getViewOffset();
-
         this.cx = elementOffset.x + (this.element.offsetWidth / 2);
         this.cy = elementOffset.y + (this.element.offsetHeight / 2);
+    }
+
+    p.initDrag = function () {
+        this.speed = 0;
         this.lastMouseAngle = undefined;
         this.lastElementAngle = undefined;
+        this.lastMouseEvent = undefined;
+    }
+
+    p.initOptions = function (options) {
+        options = options || defaults;
+
+        this.onRotate = options.onRotate || options.onrotate;
+
+        this.step = options.step || defaults.step;
+        this.stepTransitionTime = options.stepTransitionTime || defaults.stepTransitionTime;
+        this.stepTransitionEasing = options.stepTransitionEasing || defaults.stepTransitionEasing;
+
+        this.speed = options.speed || defaults.speed;
+        this.inertia = options.inertia || defaults.inertia;
+        this.minimalInertia = options.minimalInertia || defaults.minimalInertia;
+        this.lastAppliedAngle = this.virtualAngle = this.angle = options.angle || defaults.angle;
+        this.minimalAngleChange = this.step !== defaults.step ? this.step : defaults.minimalAngleChange;
     }
 
     p.initHardwareAcceleration = function () {
@@ -325,6 +281,10 @@
         }
     }
 
+    p.returnFalse = function () {
+        return false;
+    }
+
     //Wrap to jQuery plugin
     if (w.$ !== undefined) {
         $.propeller = {};
@@ -343,7 +303,16 @@
 
     //Init CSS prefix
     //TODO CSS prefix initialization
-    Propeller.cssPrefix = '-webkit-';
+
+    if (typeof(document.body.style.transform) != 'undefined') {
+        Propeller.cssPrefix = '';
+    } else if (typeof(document.body.style.mozTransform) != 'undefined') {
+        Propeller.cssPrefix = '-moz-';
+    } else if (typeof(document.body.style.webkitTransform) != 'undefined') {
+        Propeller.cssPrefix = '-webkit-';
+    } else if (typeof(document.body.style.msTransform) != 'undefined') {
+        Propeller.cssPrefix = '-ms-';
+    }
 
     w.Propeller = Propeller;
 })(window);
@@ -356,3 +325,28 @@ window.requestAnimFrame = (function () {
             window.setTimeout(callback, 1000 / 60);
         };
 })();
+
+if (!Function.prototype.bind) {
+    Function.prototype.bind = function (oThis) {
+        if (typeof this !== "function") {
+            // closest thing possible to the ECMAScript 5 internal IsCallable function
+            throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+        }
+
+        var aArgs = Array.prototype.slice.call(arguments, 1),
+            fToBind = this,
+            fNOP = function () {
+            },
+            fBound = function () {
+                return fToBind.apply(this instanceof fNOP && oThis
+                    ? this
+                    : oThis,
+                    aArgs.concat(Array.prototype.slice.call(arguments)));
+            };
+
+        fNOP.prototype = this.prototype;
+        fBound.prototype = new fNOP();
+
+        return fBound;
+    };
+}

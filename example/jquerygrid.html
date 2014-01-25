@@ -51,26 +51,28 @@
                 <img class="turbine" width="100%" height="auto" id="example6" src="./img/turbine.png">
             </td>
         </tr>
-        <!--<tr>
+        <tr>
             <td class="example">
                 <p>
-                    $('#example7').propeller({inertia: 1, speed: 0, step: 30, stepTransitionTime: 300});
+                    $('#example7').propeller({inertia: 1, speed: 0, step: 30, stepTransitionTime: 500});
                 </p>
                 <img class="turbine" width="100%" height="auto" id="example7" src="./img/turbine.png">
             </td>
             <td class="example">
                 <p>
-                    $('#example8').propeller({inertia: 0.99, speed: 0, step: 10, stepTransitionTime: 300});
+                    $('#example8').propeller({inertia: 0.99, speed: 0, step: 10, stepTransitionTime: 100});
                 </p>
                 <img class="turbine" width="100%" height="auto" id="example8" src="./img/turbine.png">
             </td>
             <td class="example">
                 <p>
-                    $('#example9').propeller({inertia: 0, speed: 0, step: 45, stepTransitionTime: 300});
+                    $('#example9').propeller({inertia: 0, speed: 0, step: 45, stepTransitionTime: 300, <br>onRotate: function(){
+                    console.log(this.angle);
+                    }});
                 </p>
                 <img class="turbine" width="100%" height="auto" id="example9" src="./img/turbine.png">
             </td>
-        </tr>-->
+        </tr>
     </table>
 </div>
 <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
@@ -82,9 +84,11 @@
     $('#example4').propeller({inertia: 1, speed: 0, step: 30});
     $('#example5').propeller({inertia: 0.99, speed: 0, step: 10});
     $('#example6').propeller({inertia: 0, speed: 0, step: 45});
-    /*$('#example7').propeller({inertia: 1, speed: 0, step: 30, stepTransitionTime: 300, stepTransitionEasing: 'ease-in-out'});
-    $('#example8').propeller({inertia: 0.99, speed: 0, step: 10, stepTransitionTime: 300, stepTransitionEasing: 'ease-in'});
-    $('#example9').propeller({inertia: 0, speed: 0, step: 45, stepTransitionTime: 300, stepTransitionEasing: 'ease-out'});*/
+    $('#example7').propeller({inertia: 1, speed: 0, step: 30, stepTransitionTime: 500, stepTransitionEasing: 'ease-in-out'});
+    $('#example8').propeller({inertia: 0.99, speed: 0, step: 10, stepTransitionTime: 100, stepTransitionEasing: 'ease-in'});
+    $('#example9').propeller({inertia: 0, speed: 0, step: 45, stepTransitionTime: 300, stepTransitionEasing: 'ease-out', onRotate: function(){
+        console.log(this.angle);
+    }});
 </script>
 </body>
 </html>

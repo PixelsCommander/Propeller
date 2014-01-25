@@ -1,0 +1,26 @@
+{
+    "name": "Propeller",
+    "version": "0.3.0",
+    "description": "JavaScript library to rotate elements by mouse with inertia or without it.",
+    "main": "index.js",
+    "directories": {
+        "example": "example"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/PixelsCommander/Propeller.git"
+    },
+    "author": "Denis Radin",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/PixelsCommander/Propeller/issues"
+    },
+    "homepage": "https://github.com/PixelsCommander/Propeller",
+    "devDependencies": {
+        "grunt": "~0.4.2",
+        "grunt-contrib-uglify": "~0.2.7"
+    }
+}
