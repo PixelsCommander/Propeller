@@ -151,7 +151,7 @@ h1 {
     display: none;
 }
 
-a {
+.content>a {
     z-index: 100;
     position: relative;
     display: inline-block;
@@ -166,7 +166,7 @@ a {
     margin-right: 11px;
 }
 
-a:hover {
+.content>a:hover {
     background-color: #ffffff;
     color: #1b5fc4;
 }
@@ -175,6 +175,11 @@ a:hover {
     padding: 20px;
     box-sizing: border-box;
 }
+
+.social_stuff {
+    margin-top: 30px;
+}
+
 
 /* ==========================================================================
    Helper classes
