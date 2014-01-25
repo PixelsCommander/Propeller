@@ -1,11 +1,8 @@
-# Propeller.js
+![Propeller.js](http://pixelscommander.com/polygon/propeller/logo.gif "JavaScript library to rotate HTML elements by mouse or touch gestures")
 
 JavaScript library to rotate elements by mouse. Supports inertion and stepwise rotation. It is also compatible with touch devices.
 
 [Demo](http://pixelscommander.com/polygon/propeller/)
-
-##Performance
-Propeller uses requestAnimationFrame and GPU compositing for better performance.
 
 ##Usage
 
@@ -14,6 +11,9 @@ Propeller uses requestAnimationFrame and GPU compositing for better performance.
 
 ####or zero-dependancy library 
     new Propeller(nodeOrSelector, options)
+
+##Performance
+Propeller uses requestAnimationFrame and GPU compositing for better performance.
     
 ##Options
 - **Inertion** is the most valueble option. It is a number between 0 and 1. 0 means no rotation after mouse was released. 1 means infinite rotation. For this demo we use inertia equals to 0.99.
