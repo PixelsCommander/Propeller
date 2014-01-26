@@ -16,7 +16,7 @@ JavaScript library to rotate elements by mouse. Supports inertion and stepwise r
 Propeller uses requestAnimationFrame and GPU compositing for better performance.
     
 ##Options
-- **Inertion** is the most valueble option. It is a number between 0 and 1. 0 means no rotation after mouse was released. 1 means infinite rotation. For this demo we use inertia equals to 0.99.
+- **inertia** is the most valueble option. It is a number between 0 and 1. 0 means no rotation after mouse was released. 1 means infinite rotation. For this demo we use inertia equals to 0.99.
 - **speed** - initial speed of rotation. It also can be used as property in runtime.
 - **step** allows to set step in degrees for stepwise mode.
 - **stepTransitionTime** enables CSS transition to move from step to step. This makes steps smooth and allows to use CSS transitions easing.

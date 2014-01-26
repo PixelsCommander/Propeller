@@ -135,6 +135,7 @@ h1 {
 }
 
 .facts {
+    margin: 0;
     z-index: 98;
     width: 100%;
     padding: 0 0 0 3px;
@@ -154,7 +155,7 @@ h1 {
 .content>a {
     z-index: 100;
     position: relative;
-    display: inline-block;
+    display: noner;
     padding: 10px;
     text-decoration: none;
     color: #ffffff;
