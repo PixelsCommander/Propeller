@@ -16,7 +16,8 @@
  *      Inspired by Brian Gonzalez
  */
 
-;(function (w) {
+;
+(function (w) {
 
     var jqPluginName = 'propeller';
 
@@ -64,11 +65,20 @@
     var p = Propeller.prototype;
 
     p.addListeners = function () {
-        this.element.addEventListener('mousedown', this.onRotationStart.bind(this));
-        this.element.addEventListener('mousemove', this.onRotated.bind(this));
-        this.element.addEventListener('mouseup', this.onRotationStop.bind(this));
-        this.element.addEventListener('mouseleave', this.onRotationStop.bind(this));
-        this.element.addEventListener('dragstart', this.returnFalse);
+        if ('ontouchstart' in document.documentElement) {
+            this.element.addEventListener('touchstart', this.onRotationStart.bind(this));
+            this.element.addEventListener('touchmove', this.onRotated.bind(this));
+            this.element.addEventListener('touchend', this.onRotationStop.bind(this));
+            this.element.addEventListener('touchcancel', this.onRotationStop.bind(this));
+            this.element.addEventListener('dragstart', this.returnFalse);
+        } else {
+            this.element.addEventListener('mousedown', this.onRotationStart.bind(this));
+            this.element.addEventListener('mousemove', this.onRotated.bind(this));
+            this.element.addEventListener('mouseup', this.onRotationStop.bind(this));
+            this.element.addEventListener('mouseleave', this.onRotationStop.bind(this));
+            this.element.addEventListener('dragstart', this.returnFalse);
+        }
+
         this.element.ondragstart = this.returnFalse;
     }
 
@@ -85,7 +95,20 @@
 
     p.onRotated = function (event) {
         if (this.active === true) {
-            this.lastMouseEvent = event;
+            event.stopPropagation();
+            event.preventDefault();
+
+            if (event.touches !== undefined && event.touches[0] !== undefined) {
+                this.lastMouseEvent = {
+                    pageX: event.touches[0].pageX,
+                    pageY: event.touches[0].pageY
+                }
+            } else {
+                this.lastMouseEvent = {
+                    pageX: event.pageX,
+                    pageY: event.pageY
+                }
+            }
         }
     }
 
@@ -105,7 +128,7 @@
 
     p.updateCSSRotate = function () {
         if (Math.abs(this.lastAppliedAngle - this.angle) >= this.minimalAngleChange && this.transiting === false) {
-            this.element.style[Propeller.cssPrefix + 'transform'] = 'rotate(' + this.angle + 'deg) translateZ(0)';
+            this.element.style[Propeller.cssPrefix + 'transform'] = 'rotate(' + this.angle + 'deg) ' + this.accelerationPostfix;
             this.lastAppliedAngle = this.angle;
 
             //Prevents new transition before old is completed
@@ -157,6 +180,7 @@
     p.updateAngleToMouse = function (event) {
         var xDiff = event.pageX - this.cx;
         var yDiff = event.pageY - this.cy;
+
         var mouseRadians = Math.atan2(xDiff, yDiff);
         var mouseDegrees = mouseRadians * (180 / Math.PI * -1) + 180;
 
@@ -212,7 +236,39 @@
     }
 
     p.initHardwareAcceleration = function () {
-        this.element.style[Propeller.cssPrefix + 'transform'] = 'translateZ(0)';
+        this.accelerationPostfix = '';
+
+        //Check for CSS3d support
+        var el = document.createElement('p'),
+            has3d,
+            transforms = {
+                'webkitTransform':'-webkit-transform',
+                'OTransform':'-o-transform',
+                'msTransform':'-ms-transform',
+                'MozTransform':'-moz-transform',
+                'transform':'transform'
+            };
+
+        document.body.insertBefore(el, null);
+
+        for (var t in transforms) {
+            if (el.style[t] !== undefined) {
+                el.style[t] = "translate3d(1px,1px,1px)";
+                has3d = window.getComputedStyle(el).getPropertyValue(transforms[t]);
+            }
+        }
+
+        document.body.removeChild(el);
+
+        var supported =  (has3d !== undefined && has3d.length > 0 && has3d !== "none");
+
+        //If CSS3d is supported then ann translateZ hack to enable GPU acceleration on layer
+        if (supported === true) {
+            this.accelerationPostfix = 'translateZ(0)';
+            this.element.style[Propeller.cssPrefix + 'transform'] = this.accelerationPostfix;
+
+        }
+
     }
 
     p.initTransition = function () {

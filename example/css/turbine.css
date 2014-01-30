@@ -113,6 +113,11 @@ body, html {
     z-index: 99;
 }
 
+.turbine {
+    width: 100%;
+    height: auto;
+}
+
 .arrow {
     position: absolute;
     top: 8%;
