@@ -113,7 +113,7 @@
     }
 
     p.update = function () {
-        //Calculating angle on requestAnimationFrame only allows to avoid executing this when unnecessary
+        //Calculating angle on requestAnimationFrame only for optimisation purposes
         if (this.lastMouseEvent !== undefined && this.active === true) {
             this.updateAngleToMouse(this.lastMouseEvent);
         }
@@ -128,7 +128,10 @@
 
     p.updateCSSRotate = function () {
         if (Math.abs(this.lastAppliedAngle - this.angle) >= this.minimalAngleChange && this.transiting === false) {
+
             this.element.style[Propeller.cssPrefix + 'transform'] = 'rotate(' + this.angle + 'deg) ' + this.accelerationPostfix;
+            var radians = this.angle * Math.PI / 180;
+
             this.lastAppliedAngle = this.angle;
 
             //Prevents new transition before old is completed
@@ -153,12 +156,11 @@
     }
 
     p.differenceBetweenAngles = function (newAngle, oldAngle) {
-        if (newAngle >= 180 && oldAngle < 180) {
-            newAngle = 360 - newAngle;
-        } else if (newAngle <= 180 && oldAngle > 180) {
-            oldAngle = 360 - oldAngle;
-        }
-        return newAngle - oldAngle;
+        var a1 = newAngle * (Math.PI / 180);
+        var a2 = oldAngle * (Math.PI / 180);
+        var radians = Math.atan2(Math.sin(a1 - a2), Math.cos(a1 - a2));
+        var degrees = radians * (180 / Math.PI);
+        return Math.round(degrees * 100) / 100;
     }
 
     p.applySpeed = function () {
@@ -196,7 +198,6 @@
             this.virtualAngle = this.lastElementAngle + this.mouseDiff;
             this.lastElementAngle = this.virtualAngle;
             this.lastMouseAngle = mouseDegrees;
-            //console.log('this.lastMouseAngle ' + this.lastMouseAngle + ', mouseDegrees ' + mouseDegrees + ', this.mouseDiff ' + this.mouseDiff);
         } else {
             var oldAngle = this.virtualAngle;
             this.mouseDiff = mouseDegrees - this.lastMouseAngle;
@@ -242,11 +243,11 @@
         var el = document.createElement('p'),
             has3d,
             transforms = {
-                'webkitTransform':'-webkit-transform',
-                'OTransform':'-o-transform',
-                'msTransform':'-ms-transform',
-                'MozTransform':'-moz-transform',
-                'transform':'transform'
+                'webkitTransform': '-webkit-transform',
+                'OTransform': '-o-transform',
+                'msTransform': '-ms-transform',
+                'MozTransform': '-moz-transform',
+                'transform': 'transform'
             };
 
         document.body.insertBefore(el, null);
@@ -260,7 +261,7 @@
 
         document.body.removeChild(el);
 
-        var supported =  (has3d !== undefined && has3d.length > 0 && has3d !== "none");
+        var supported = (has3d !== undefined && has3d.length > 0 && has3d !== "none");
 
         //If CSS3d is supported then ann translateZ hack to enable GPU acceleration on layer
         if (supported === true) {

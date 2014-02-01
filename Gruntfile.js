@@ -7,10 +7,15 @@ module.exports = function(grunt) {
                     'dist/propeller.min.js': ['src/propeller.js']
                 }
             }
+        },
+        karma: {
+            unit: {
+                configFile: 'karma.conf.js'
+            }
         }
-
     });
 
+    grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
     grunt.registerTask('default', 'uglify');
