@@ -38,8 +38,10 @@
             element = document.querySelectorAll(element);
         }
 
-        if (typeof  element === 'array') {
+        if (element.length > 1) {
             return Propeller.createMany(element, options);
+        } else if (element.length === 1) {
+            element = element[0];
         }
 
         this.element = element;
@@ -47,6 +49,7 @@
         this.transiting = false;
         this.update = this.update.bind(this);
 
+        this.initCSSPrefix();
         this.initOptions(options);
         this.initHardwareAcceleration();
         this.initTransition();
@@ -236,6 +239,20 @@
         this.minimalAngleChange = this.step !== defaults.step ? this.step : defaults.minimalAngleChange;
     }
 
+    p.initCSSPrefix = function () {
+        if (Propeller.cssPrefix === undefined) {
+            if (typeof(document.body.style.transform) != 'undefined') {
+                Propeller.cssPrefix = '';
+            } else if (typeof(document.body.style.mozTransform) != 'undefined') {
+                Propeller.cssPrefix = '-moz-';
+            } else if (typeof(document.body.style.webkitTransform) != 'undefined') {
+                Propeller.cssPrefix = '-webkit-';
+            } else if (typeof(document.body.style.msTransform) != 'undefined') {
+                Propeller.cssPrefix = '-ms-';
+            }
+        }
+    }
+
     p.initHardwareAcceleration = function () {
         this.accelerationPostfix = '';
 
@@ -335,14 +352,16 @@
             }
         }
         else {
-            if (node.localName == 'BODY') {
+            if (node.localName.toLowerCase() == 'body') {
                 var style = view.getComputedStyle(node, '');
                 coords.x += parseInt(style.borderLeftWidth);
                 coords.y += parseInt(style.borderTopWidth);
 
                 var htmlStyle = view.getComputedStyle(node.parentNode, '');
-                coords.x -= parseInt(htmlStyle.paddingLeft);
-                coords.y -= parseInt(htmlStyle.paddingTop);
+                coords.x += parseInt(htmlStyle.paddingLeft);
+                coords.y += parseInt(htmlStyle.paddingTop);
+                coords.x += parseInt(htmlStyle.marginLeft);
+                coords.y += parseInt(htmlStyle.marginTop);
             }
 
             if (node.scrollLeft)
@@ -374,19 +393,6 @@
                 }
             });
         };
-    }
-
-    //Init CSS prefix
-    //TODO CSS prefix initialization
-
-    if (typeof(document.body.style.transform) != 'undefined') {
-        Propeller.cssPrefix = '';
-    } else if (typeof(document.body.style.mozTransform) != 'undefined') {
-        Propeller.cssPrefix = '-moz-';
-    } else if (typeof(document.body.style.webkitTransform) != 'undefined') {
-        Propeller.cssPrefix = '-webkit-';
-    } else if (typeof(document.body.style.msTransform) != 'undefined') {
-        Propeller.cssPrefix = '-ms-';
     }
 
     w.Propeller = Propeller;

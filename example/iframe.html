@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Iframe rotation example</title>
+    <script src="../src/propeller.js"></script>
+    <style>
+        html, body {
+            margin: 50%;
+            font-family: Helvetica Neue, Helvetica, Arial;
+            font-weight: bold;
+        }
+
+        #propellerFrame {
+            margin-left: -202px;
+            margin-top: -440px;
+            width: 404px;
+            height: 843px;
+            background: url(./img/iphone.png) no-repeat;
+        }
+
+        .iframeContainer {
+            position: absolute;
+            width: 337px;
+            height: 595px;
+            left: 35px;
+            top: 125px;
+            background-color: #00A000;
+        }
+
+        .iphoneContent {
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+        }
+
+        .arrow {
+            position: absolute;
+            left: 5%;
+            top: 15%;
+        }
+
+    </style>
+</head>
+<body style="margin: auto auto">
+<div class="arrow">
+    <img src="img/iphonearrow.png">
+    <p id="tip">
+        Try to rotate iPhone,<br> not it`s content
+    </p>
+</div>
+<div id="propellerFrame">
+    <div class="iframeContainer">
+        <iframe class="iphoneContent" src="http://www.britishcouncil.org.ua/" ></iframe>
+    </div>
+</div>
+</body>
+<script>
+    new Propeller('#propellerFrame', {
+        inertia: 0.95,
+        onrotate: function() {
+            if (window.iphonerotated === undefined) {
+                setTimeout(function(){
+                    document.getElementById('tip').innerHTML = 'Now feel free to use content';
+                }, 500);
+            }
+            window.iphonerotated = true;
+        }
+    });
+</script>
+</html>
