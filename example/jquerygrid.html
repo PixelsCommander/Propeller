@@ -20,7 +20,7 @@
             </td>
             <td class="example">
                 <p>
-                    $('#example2').propeller({inertia: 0.99, speed: 0});
+                    $('#example2').propeller({inertia: 0.99, speed: 0, onStop: function(){alert('Stopped')}});
                 </p>
                 <img class="turbine" width="100%" height="auto" id="example2" src="./img/turbine.png">
             </td>
@@ -75,11 +75,35 @@
         </tr>
     </table>
 </div>
+<div class="content" style="position: static; margin-left: 20px; margin-bottom: 20px; padding-bottom: 20px;">
+    <a href="./iframe.html">More examples</a>
+    <a 
+       href="http://pixelscommander.com/en/javascript/rotate-html-elements-with-mouse/">Documentation</a>
+    <a href="https://github.com/PixelsCommander/Propeller/archive/master.zip">Download</a>
+    <a href="https://github.com/PixelsCommander/Propeller">GitHub</a>
+
+    <div class="social_stuff">
+        <!-- AddThis Button BEGIN -->
+        <div class="addthis_toolbox addthis_default_style">
+            <a class="addthis_button_tweet"></a>
+            <iframe style="display: inline-block;"
+                    src="http://ghbtns.com/github-btn.html?user=PixelsCommander&repo=Propeller&type=watch"
+                    allowtransparency="true" frameborder="0" scrolling="0" width="62" height="20"></iframe>
+            <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+            <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+
+        </div>
+        <script type="text/javascript">var addthis_config = {"data_track_addressbar": true};</script>
+        <script type="text/javascript"
+                src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4ea2f9164143bcfb"></script>
+        <!-- AddThis Button END -->
+    </div>
+</div>
 <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="../src/propeller.js"></script>
 <script>
     $('#example1').propeller({inertia: 1, speed: 1});
-    $('#example2').propeller({inertia: 0.99, speed: 0});
+    $('#example2').propeller({inertia: 0.99, speed: 0, onStop: function(){alert('Stopped')}});
     $('#example3').propeller({inertia: 0, speed: 0});
     $('#example4').propeller({inertia: 1, speed: 0, step: 30});
     $('#example5').propeller({inertia: 0.99, speed: 0, step: 10});

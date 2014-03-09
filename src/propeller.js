@@ -25,7 +25,7 @@
         angle: 0,
         speed: 0,
         inertia: 0,
-        minimalInertia: 0.001,
+        minimalSpeed: 0.001,
         minimalAngleChange: 0.1,
         step: 0,
         stepTransitionTime: 0,
@@ -90,10 +90,20 @@
         this.initCoordinates();
         this.initDrag();
         this.active = true;
+
+        //Execute onDragStart callback if stopped
+        if (this.onDragStart !== undefined) {
+            this.onDragStart();
+        }
     }
 
     p.onRotationStop = function () {
         this.active = false;
+
+        //Execute onDragStop callback if stopped
+        if (this.onDragStop !== undefined) {
+            this.onDragStop();
+        }
     }
 
     p.onRotated = function (event) {
@@ -108,8 +118,8 @@
                 }
             } else {
                 this.lastMouseEvent = {
-                    pageX: event.pageX,
-                    pageY: event.pageY
+                    pageX: event.pageX || event.clientX,
+                    pageY: event.pageY || event.clientY
                 }
             }
         }
@@ -124,17 +134,9 @@
         this.updateAngle();
         this.applySpeed();
         this.applyInertia();
-        this.updateCSSRotate();
 
-        window.requestAnimFrame(this.update);
-    }
-
-    p.updateCSSRotate = function () {
         if (Math.abs(this.lastAppliedAngle - this.angle) >= this.minimalAngleChange && this.transiting === false) {
-
-            this.element.style[Propeller.cssPrefix + 'transform'] = 'rotate(' + this.angle + 'deg) ' + this.accelerationPostfix;
-            var radians = this.angle * Math.PI / 180;
-
+            this.updateCSS();
             this.lastAppliedAngle = this.angle;
 
             //Prevents new transition before old is completed
@@ -144,6 +146,8 @@
                 this.onRotate.bind(this)();
             }
         }
+
+        window.requestAnimFrame(this.update);
     }
 
     p.updateAngle = function () {
@@ -174,10 +178,20 @@
 
     p.applyInertia = function () {
         if (this.inertia > 0) {
-            if (Math.abs(this.speed) > this.minimalInertia) {
+            if (Math.abs(this.speed) >= this.minimalSpeed) {
                 this.speed = this.speed * this.inertia;
-            } else {
+
+                //Execute onStop callback if stopped
+                if (this.active === false && Math.abs(this.speed) < this.minimalSpeed) {
+                    if (this.onStop !== undefined) {
+                        this.onStop();
+                    }
+                }
+            } else if (this.minimalSpeed === defaults.minimalSpeed) {
+                if (this.oldSp)
                 this.speed = 0;
+            } else {
+                this.speed = this.minimalSpeed;
             }
         }
     }
@@ -227,6 +241,9 @@
         options = options || defaults;
 
         this.onRotate = options.onRotate || options.onrotate;
+        this.onStop = options.onStop || options.onstop;
+        this.onDragStop = options.onDragStop || options.ondragstop;
+        this.onDragStart = options.onDragStart || options.ondragstart;
 
         this.step = options.step || defaults.step;
         this.stepTransitionTime = options.stepTransitionTime || defaults.stepTransitionTime;
@@ -234,7 +251,7 @@
 
         this.speed = options.speed || defaults.speed;
         this.inertia = options.inertia || defaults.inertia;
-        this.minimalInertia = options.minimalInertia || defaults.minimalInertia;
+        this.minimalSpeed = options.minimalSpeed || defaults.minimalSpeed;
         this.lastAppliedAngle = this.virtualAngle = this.angle = options.angle || defaults.angle;
         this.minimalAngleChange = this.step !== defaults.step ? this.step : defaults.minimalAngleChange;
     }
@@ -284,9 +301,7 @@
         if (supported === true) {
             this.accelerationPostfix = 'translateZ(0)';
             this.element.style[Propeller.cssPrefix + 'transform'] = this.accelerationPostfix;
-
         }
-
     }
 
     p.initTransition = function () {
@@ -295,6 +310,11 @@
             this.element.style[Propeller.cssPrefix + 'transition'] = prop;
         }
     }
+
+    p.updateCSS = function () {
+        this.element.style[Propeller.cssPrefix + 'transform'] = 'rotate(' + this.angle + 'deg) ' + this.accelerationPostfix;
+    }
+
 
     p.blockTransition = function () {
         if (this.stepTransitionTime !== defaults.stepTransitionTime) {
@@ -309,8 +329,15 @@
     //Calculating pageX, pageY for elements with offset parents
     p.getViewOffset = function (singleFrame) {
         var coords = { x: 0, y: 0 };
+
+        if (Propeller.IEVersion !== false && Propeller.IEVersion < 9) {
+            coords.x = this.element.offsetLeft;
+            coords.y = this.element.offsetTop;
+            return coords;
+        }
+
         if (this.element)
-            this.addOffset(this.element, coords, this.element.ownerDocument.defaultView);
+            this.addOffset(this.element, coords, 'defaultView' in document ? document.defaultView : document.parentWindow);
 
         return coords;
     }
@@ -327,17 +354,17 @@
                     coords.x += parseInt(parentStyle.borderLeftWidth);
                     coords.y += parseInt(parentStyle.borderTopWidth);
 
-                    if (p.localName == 'TABLE') {
+                    if (p.localName.toLowerCase() == 'table') {
                         coords.x += parseInt(parentStyle.paddingLeft);
                         coords.y += parseInt(parentStyle.paddingTop);
                     }
-                    else if (p.localName == 'BODY') {
+                    else if (p.localName.toLowerCase() == 'body') {
                         var style = view.getComputedStyle(node, '');
                         coords.x += parseInt(style.marginLeft);
                         coords.y += parseInt(style.marginTop);
                     }
                 }
-                else if (p.localName == 'BODY') {
+                else if (p.localName.toLowerCase() == 'body') {
                     coords.x += parseInt(parentStyle.borderLeftWidth);
                     coords.y += parseInt(parentStyle.borderTopWidth);
                 }
@@ -395,9 +422,14 @@
         };
     }
 
+    var nav = navigator.userAgent.toLowerCase();
+    Propeller.IEVersion = (nav.indexOf('msie') != -1) ? parseInt(nav.split('msie')[1]) : false;
+    Propeller.deg2radians = Math.PI * 2 / 360;
+
     w.Propeller = Propeller;
 })(window);
 
+//RequestAnimatedFrame polyfill
 window.requestAnimFrame = (function () {
     return  window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
@@ -407,6 +439,7 @@ window.requestAnimFrame = (function () {
         };
 })();
 
+//Function.bind polyfill
 if (!Function.prototype.bind) {
     Function.prototype.bind = function (oThis) {
         if (typeof this !== "function") {
@@ -430,4 +463,65 @@ if (!Function.prototype.bind) {
 
         return fBound;
     };
+}
+
+//IE addEventListener polyfill
+(function (win, doc) {
+    if (win.addEventListener)return;		//No need to polyfill
+
+    function docHijack(p) {
+        var old = doc[p];
+        doc[p] = function (v) {
+            return addListen(old(v))
+        }
+    }
+
+    function addEvent(on, fn, self) {
+        return (self = this).attachEvent('on' + on, function (e) {
+            var e = e || win.event;
+            e.preventDefault = e.preventDefault || function () {
+                e.returnValue = false
+            }
+            e.stopPropagation = e.stopPropagation || function () {
+                e.cancelBubble = true
+            }
+            fn.call(self, e);
+        });
+    }
+
+    function addListen(obj, i) {
+        if (i = obj.length)while (i--)obj[i].addEventListener = addEvent;
+        else obj.addEventListener = addEvent;
+        return obj;
+    }
+
+    addListen([doc, win]);
+    if ('Element' in win)win.Element.prototype.addEventListener = addEvent;			//IE8
+    else {		//IE < 8
+        doc.attachEvent('onreadystatechange', function () {
+            addListen(doc.all)
+        });		//Make sure we also init at domReady
+        docHijack('getElementsByTagName');
+        docHijack('getElementById');
+        docHijack('createElement');
+        addListen(doc.all);
+    }
+})(window, document);
+
+//IE getComputedStyle polyfill
+if (!window.getComputedStyle) {
+    window.getComputedStyle = function (el, pseudo) {
+        this.el = el;
+        this.getPropertyValue = function (prop) {
+            var re = /(\-([a-z]){1})/g;
+            if (prop == 'float') prop = 'styleFloat';
+            if (re.test(prop)) {
+                prop = prop.replace(re, function () {
+                    return arguments[2].toUpperCase();
+                });
+            }
+            return el.currentStyle[prop] ? el.currentStyle[prop] : null;
+        }
+        return this;
+    }
 }
