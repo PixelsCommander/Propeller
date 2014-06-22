@@ -154,12 +154,21 @@
         if (this.step > 0) {
             this.angle = this.getAngleFromVirtual();
         } else {
-            this.angle = this.virtualAngle;
+            this.angle = this.normalizeAngle(this.virtualAngle);
         }
     }
 
     p.getAngleFromVirtual = function () {
         return Math.ceil(this.virtualAngle / this.step) * this.step;
+    }
+
+    p.normalizeAngle = function (angle) {
+        var result = angle;
+        result = result % 360;
+        if (result < 0) {
+            result = 360 + result;
+        }
+        return result;
     }
 
     p.differenceBetweenAngles = function (newAngle, oldAngle) {
@@ -189,7 +198,7 @@
                 }
             } else if (this.minimalSpeed === defaults.minimalSpeed) {
                 if (this.oldSp)
-                this.speed = 0;
+                    this.speed = 0;
             } else {
                 this.speed = this.minimalSpeed;
             }
