@@ -20,7 +20,7 @@
             </td>
             <td class="example">
                 <p>
-                    $('#example2').propeller({inertia: 0.99, speed: 0, onStop: function(){alert('Stopped')}});
+                    $('#example2').propeller({inertia: 0.98, speed: 0, onStop: function(){alert('Stopped')}});
                 </p>
                 <img class="turbine" width="100%" height="auto" id="example2" src="./img/turbine.png">
             </td>
@@ -103,7 +103,7 @@
 <script src="../src/propeller.js"></script>
 <script>
     $('#example1').propeller({inertia: 1, speed: 1});
-    $('#example2').propeller({inertia: 0.99, speed: 0, onStop: function(){alert('Stopped')}});
+    $('#example2').propeller({inertia: 0.98, speed: 0, angle: 30, onStop: function(){alert('Stopped')}});
     $('#example3').propeller({inertia: 0, speed: 0});
     $('#example4').propeller({inertia: 1, speed: 0, step: 30});
     $('#example5').propeller({inertia: 0.99, speed: 0, step: 10});

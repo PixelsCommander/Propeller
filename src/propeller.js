@@ -33,7 +33,6 @@
     };
 
     var Propeller = function (element, options) {
-
         if (typeof element === 'string') {
             element = document.querySelectorAll(element);
         }
@@ -50,6 +49,7 @@
         this.update = this.update.bind(this);
 
         this.initCSSPrefix();
+        this.initAngleGetterSetter();
         this.initOptions(options);
         this.initHardwareAcceleration();
         this.initTransition();
@@ -66,6 +66,16 @@
     };
 
     var p = Propeller.prototype;
+
+    p.initAngleGetterSetter = function () {
+        getterSetter(this, 'angle', function(){
+            return this._angle
+        }, function(value){
+            this._angle = value;
+            this.virtualAngle = value;
+            this.updateCSS();
+        });
+    }
 
     p.addListeners = function () {
         if ('ontouchstart' in document.documentElement) {
@@ -135,9 +145,9 @@
         this.applySpeed();
         this.applyInertia();
 
-        if (Math.abs(this.lastAppliedAngle - this.angle) >= this.minimalAngleChange && this.transiting === false) {
+        if (Math.abs(this.lastAppliedAngle - this._angle) >= this.minimalAngleChange && this.transiting === false) {
             this.updateCSS();
-            this.lastAppliedAngle = this.angle;
+            this.lastAppliedAngle = this._angle;
 
             //Prevents new transition before old is completed
             this.blockTransition();
@@ -152,9 +162,9 @@
 
     p.updateAngle = function () {
         if (this.step > 0) {
-            this.angle = this.getAngleFromVirtual();
+            this._angle = this.getAngleFromVirtual();
         } else {
-            this.angle = this.normalizeAngle(this.virtualAngle);
+            this._angle = this.normalizeAngle(this.virtualAngle);
         }
     }
 
@@ -255,10 +265,11 @@
         this.stepTransitionTime = options.stepTransitionTime || defaults.stepTransitionTime;
         this.stepTransitionEasing = options.stepTransitionEasing || defaults.stepTransitionEasing;
 
+        this.angle = options.angle || defaults.angle;
         this.speed = options.speed || defaults.speed;
         this.inertia = options.inertia || defaults.inertia;
         this.minimalSpeed = options.minimalSpeed || defaults.minimalSpeed;
-        this.lastAppliedAngle = this.virtualAngle = this.angle = options.angle || defaults.angle;
+        this.lastAppliedAngle = this.virtualAngle = this._angle = options.angle || defaults.angle;
         this.minimalAngleChange = this.step !== defaults.step ? this.step : defaults.minimalAngleChange;
     }
 
@@ -307,6 +318,7 @@
         if (supported === true) {
             this.accelerationPostfix = 'translateZ(0)';
             this.element.style[Propeller.cssPrefix + 'transform'] = this.accelerationPostfix;
+            this.updateCSS();
         }
     }
 
@@ -318,7 +330,7 @@
     }
 
     p.updateCSS = function () {
-        this.element.style[Propeller.cssPrefix + 'transform'] = 'rotate(' + this.angle + 'deg) ' + this.accelerationPostfix;
+        this.element.style[Propeller.cssPrefix + 'transform'] = 'rotate(' + this._angle + 'deg) ' + this.accelerationPostfix;
     }
 
 
@@ -529,5 +541,20 @@ if (!window.getComputedStyle) {
             return el.currentStyle[prop] ? el.currentStyle[prop] : null;
         }
         return this;
+    }
+}
+
+function getterSetter(variableParent, variableName, getterFunction, setterFunction){
+    if (Object.defineProperty)
+    {
+        Object.defineProperty(variableParent, variableName, {
+            get: getterFunction,
+            set: setterFunction
+        });
+    }
+    else if (document.__defineGetter__)
+    {
+        variableParent.__defineGetter__(variableName, getterFunction);
+        variableParent.__defineSetter__(variableName, setterFunction);
     }
 }

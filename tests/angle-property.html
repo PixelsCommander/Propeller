@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html style="-webkit-overflow-scrolling: touch;">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Rotate HTML elements by mouse in JavaScript - Propeller.js</title>
+    <meta name="viewport" content="width=device-width, target-densitydpi=device-dpi">
+    <link rel="stylesheet" href="../example/css/normalize.css">
+    <link rel="stylesheet" href="../example/css/turbine.css">
+</head>
+<body>
+
+<img src="../example/img/turbineforthumbs.jpg" width="0px" height="0px">
+<img id="turbine" src="../example/img/turbine.png">
+
+<div class="arrow">
+    <img src="../example/img/arrow.png">
+
+    <p>
+        Drag or swipe propeller
+    </p>
+</div>
+<script src="../src/propeller.js"></script>
+<script>
+    new Propeller(document.getElementById('turbine'), {
+        inertia: 0.89,
+        angle: 30
+    });
+</script>
+</body>
+</html>

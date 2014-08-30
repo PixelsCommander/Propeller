@@ -9,7 +9,7 @@ describe("Angle transformation routines", function() {
 describe("Defaults configuration", function() {
     it("should have minimal inertia and minimal angle change be set from defaults", function() {
         expect(propeller.minimalAngleChange).toEqual(0.1);
-        expect(propeller.minimalInertia).toEqual(0.001);
+        expect(propeller.minimalSpeed).toEqual(0.001);
     });
 });
 
