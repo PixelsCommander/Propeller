@@ -29,7 +29,8 @@
         minimalAngleChange: 0.1,
         step: 0,
         stepTransitionTime: 0,
-        stepTransitionEasing: 'linear'
+        stepTransitionEasing: 'linear',
+        rotateParentInstantly: false
     };
 
     var Propeller = function (element, options) {
@@ -104,6 +105,10 @@
         //Execute onDragStart callback if stopped
         if (this.onDragStart !== undefined) {
             this.onDragStart();
+        }
+
+        if (this.rotateParentInstantly === false) {
+            event.stopPropagation();
         }
     }
 
@@ -271,6 +276,7 @@
         this.minimalSpeed = options.minimalSpeed || defaults.minimalSpeed;
         this.lastAppliedAngle = this.virtualAngle = this._angle = options.angle || defaults.angle;
         this.minimalAngleChange = this.step !== defaults.step ? this.step : defaults.minimalAngleChange;
+        this.rotateParentInstantly = options.rotateParentInstantly || defaults.rotateParentInstantly;
     }
 
     p.initCSSPrefix = function () {
