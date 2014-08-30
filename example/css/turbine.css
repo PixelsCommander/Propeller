@@ -103,7 +103,6 @@ body, html {
     height: 100%;
     font-family: "Helvetica Neue", "Helvetica", "Arial";
     color: #ffffff;
-    overflow: hidden;
 }
 
 #turbine {

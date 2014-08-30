@@ -196,11 +196,8 @@
                         this.onStop();
                     }
                 }
-            } else if (this.minimalSpeed === defaults.minimalSpeed) {
-                if (this.oldSp)
-                    this.speed = 0;
-            } else {
-                this.speed = this.minimalSpeed;
+            } else if (this.speed !== 0) {
+                this.speed = 0;
             }
         }
     }
