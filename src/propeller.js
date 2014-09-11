@@ -137,7 +137,6 @@
 
         if (Math.abs(this.lastAppliedAngle - this.angle) >= this.minimalAngleChange && this.transiting === false) {
             this.updateCSS();
-            this.lastAppliedAngle = this.angle;
 
             //Prevents new transition before old is completed
             this.blockTransition();
@@ -145,6 +144,9 @@
             if (this.onRotate !== undefined && typeof this.onRotate === 'function') {
                 this.onRotate.bind(this)();
             }
+            
+            this.lastAppliedAngle = this.angle;
+
         }
 
         window.requestAnimFrame(this.update);
