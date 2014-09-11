@@ -29,7 +29,8 @@
         minimalAngleChange: 0.1,
         step: 0,
         stepTransitionTime: 0,
-        stepTransitionEasing: 'linear'
+        stepTransitionEasing: 'linear',
+        touchElement: null
     };
 
     var Propeller = function (element, options) {
@@ -68,18 +69,19 @@
     var p = Propeller.prototype;
 
     p.addListeners = function () {
+    
         if ('ontouchstart' in document.documentElement) {
-            this.element.addEventListener('touchstart', this.onRotationStart.bind(this));
-            this.element.addEventListener('touchmove', this.onRotated.bind(this));
-            this.element.addEventListener('touchend', this.onRotationStop.bind(this));
-            this.element.addEventListener('touchcancel', this.onRotationStop.bind(this));
-            this.element.addEventListener('dragstart', this.returnFalse);
+            this.touchElement.addEventListener('touchstart', this.onRotationStart.bind(this));
+            this.touchElement.addEventListener('touchmove', this.onRotated.bind(this));
+            this.touchElement.addEventListener('touchend', this.onRotationStop.bind(this));
+            this.touchElement.addEventListener('touchcancel', this.onRotationStop.bind(this));
+            this.touchElement.addEventListener('dragstart', this.returnFalse);
         } else {
-            this.element.addEventListener('mousedown', this.onRotationStart.bind(this));
-            this.element.addEventListener('mousemove', this.onRotated.bind(this));
-            this.element.addEventListener('mouseup', this.onRotationStop.bind(this));
-            this.element.addEventListener('mouseleave', this.onRotationStop.bind(this));
-            this.element.addEventListener('dragstart', this.returnFalse);
+            this.touchElement.addEventListener('mousedown', this.onRotationStart.bind(this));
+            this.touchElement.addEventListener('mousemove', this.onRotated.bind(this));
+            this.touchElement.addEventListener('mouseup', this.onRotationStop.bind(this));
+            this.touchElement.addEventListener('mouseleave', this.onRotationStop.bind(this));
+            this.touchElement.addEventListener('dragstart', this.returnFalse);
         }
 
         this.element.ondragstart = this.returnFalse;
@@ -250,6 +252,8 @@
 
     p.initOptions = function (options) {
         options = options || defaults;
+        
+        this.touchElement = document.querySelectorAll(options.touchElement)[0] || this.element;
 
         this.onRotate = options.onRotate || options.onrotate;
         this.onStop = options.onStop || options.onstop;
