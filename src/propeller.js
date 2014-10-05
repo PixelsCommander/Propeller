@@ -54,6 +54,7 @@
         this.initOptions(options);
         this.initHardwareAcceleration();
         this.initTransition();
+        this.bindHandlers();
         this.addListeners();
         this.update();
     };
@@ -69,31 +70,75 @@
     var p = Propeller.prototype;
 
     p.initAngleGetterSetter = function () {
-        getterSetter(this, 'angle', function(){
+        getterSetter(this, 'angle', function () {
             return this._angle
-        }, function(value){
+        }, function (value) {
             this._angle = value;
             this.virtualAngle = value;
             this.updateCSS();
         });
     }
 
+    p.bindHandlers = function () {
+        this.onRotationStart = this.onRotationStart.bind(this);
+        this.onRotationStop = this.onRotationStop.bind(this);
+        this.onRotated = this.onRotated.bind(this);
+    }
+
     p.addListeners = function () {
+        this.listenersInstalled = true;
+
         if ('ontouchstart' in document.documentElement) {
-            this.element.addEventListener('touchstart', this.onRotationStart.bind(this));
-            this.element.addEventListener('touchmove', this.onRotated.bind(this));
-            this.element.addEventListener('touchend', this.onRotationStop.bind(this));
-            this.element.addEventListener('touchcancel', this.onRotationStop.bind(this));
+            this.element.addEventListener('touchstart', this.onRotationStart);
+            this.element.addEventListener('touchmove', this.onRotated);
+            this.element.addEventListener('touchend', this.onRotationStop);
+            this.element.addEventListener('touchcancel', this.onRotationStop);
             this.element.addEventListener('dragstart', this.returnFalse);
         } else {
-            this.element.addEventListener('mousedown', this.onRotationStart.bind(this));
-            this.element.addEventListener('mousemove', this.onRotated.bind(this));
-            this.element.addEventListener('mouseup', this.onRotationStop.bind(this));
-            this.element.addEventListener('mouseleave', this.onRotationStop.bind(this));
+            this.element.addEventListener('mousedown', this.onRotationStart);
+            this.element.addEventListener('mousemove', this.onRotated);
+            this.element.addEventListener('mouseup', this.onRotationStop);
+            this.element.addEventListener('mouseleave', this.onRotationStop);
             this.element.addEventListener('dragstart', this.returnFalse);
         }
 
         this.element.ondragstart = this.returnFalse;
+    }
+
+    p.removeListeners = function () {
+        this.listenersInstalled = false;
+
+        if ('ontouchstart' in document.documentElement) {
+            this.element.removeEventListener('touchstart', this.onRotationStart);
+            this.element.removeEventListener('touchmove', this.onRotated);
+            this.element.removeEventListener('touchend', this.onRotationStop);
+            this.element.removeEventListener('touchcancel', this.onRotationStop);
+            this.element.removeEventListener('dragstart', this.returnFalse);
+        } else {
+            this.element.removeEventListener('mousedown', this.onRotationStart);
+            this.element.removeEventListener('mousemove', this.onRotated);
+            this.element.removeEventListener('mouseup', this.onRotationStop);
+            this.element.removeEventListener('mouseleave', this.onRotationStop);
+            this.element.removeEventListener('dragstart', this.returnFalse);
+        }
+    }
+
+    p.bind = function () {
+        if (this.listenersInstalled !== true) {
+            this.addListeners();
+        }
+    }
+
+    p.unbind = function () {
+        if (this.listenersInstalled === true) {
+            this.removeListeners();
+            this.onRotationStop();
+        }
+    }
+
+    p.stop = function () {
+        this.speed = 0;
+        this.onRotationStop();
     }
 
     p.onRotationStart = function (event) {
@@ -352,7 +397,7 @@
 
     //Calculating pageX, pageY for elements with offset parents
     p.getViewOffset = function (singleFrame) {
-        var coords = { x: 0, y: 0 };
+        var coords = {x: 0, y: 0};
 
         if (Propeller.IEVersion !== false && Propeller.IEVersion < 9) {
             coords.x = this.element.offsetLeft;
@@ -455,12 +500,12 @@
 
 //RequestAnimatedFrame polyfill
 window.requestAnimFrame = (function () {
-    return  window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        function (callback) {
-            window.setTimeout(callback, 1000 / 60);
-        };
+    return window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    function (callback) {
+        window.setTimeout(callback, 1000 / 60);
+    };
 })();
 
 //Function.bind polyfill
@@ -477,8 +522,8 @@ if (!Function.prototype.bind) {
             },
             fBound = function () {
                 return fToBind.apply(this instanceof fNOP && oThis
-                    ? this
-                    : oThis,
+                        ? this
+                        : oThis,
                     aArgs.concat(Array.prototype.slice.call(arguments)));
             };
 
@@ -550,16 +595,14 @@ if (!window.getComputedStyle) {
     }
 }
 
-function getterSetter(variableParent, variableName, getterFunction, setterFunction){
-    if (Object.defineProperty)
-    {
+function getterSetter(variableParent, variableName, getterFunction, setterFunction) {
+    if (Object.defineProperty) {
         Object.defineProperty(variableParent, variableName, {
             get: getterFunction,
             set: setterFunction
         });
     }
-    else if (document.__defineGetter__)
-    {
+    else if (document.__defineGetter__) {
         variableParent.__defineGetter__(variableName, getterFunction);
         variableParent.__defineSetter__(variableName, setterFunction);
     }

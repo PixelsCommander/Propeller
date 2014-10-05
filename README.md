@@ -27,6 +27,11 @@ Propeller uses requestAnimationFrame and GPU compositing for better performance.
 - **onDragStart** callback executed when start dragging.
 - **onDragStop** callback executed when stop dragging.
 
+##Methods
+- **unbind** unbind listeners to make propeller inactive, this does not stop rotation
+- **bind** bind listeners after they were unbinded
+- **stop** stop rotation immidiately
+
 ##Public properties
 - **angle** current propellers angle.
 - **speed** current speed of rotation. Degrees per frame.
