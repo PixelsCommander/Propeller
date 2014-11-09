@@ -2,7 +2,11 @@
 
 JavaScript library to rotate elements by mouse. Supports inertia and stepwise rotation. It is also compatible with touch devices.
 
-[Demo](http://pixelscommander.com/polygon/propeller/)
+[Lot of demos](http://pixelscommander.com/polygon/propeller/)
+
+[Project page](http://pixelscommander.com/polygon/propeller/)
+
+![Propeller.js](http://pixelscommander.com/polygon/propeller/example/demo.gif "JavaScript library to rotate HTML elements by mouse or touch gestures")
 
 ##Usage
 
