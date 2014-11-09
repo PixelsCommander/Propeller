@@ -20,7 +20,7 @@ JavaScript library to rotate elements by mouse. Supports inertia and stepwise ro
 Propeller uses requestAnimationFrame and GPU compositing for better performance.
     
 ##Options
-- **angle** sets initial angle of propeller
+- **angle** sets initial angle
 - **inertia** is the most valueble option. It is a number between 0 and 1. 0 means no rotation after mouse was released. 1 means infinite rotation. For this demo we use inertia equals to 0.99.
 - **speed** - initial speed of rotation. It also can be used as property in runtime.
 - **minimalSpeed** - minimal speed of rotation. Works only if propeller have inertia between 0 and 1.
