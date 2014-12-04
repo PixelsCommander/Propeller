@@ -30,7 +30,8 @@
         step: 0,
         stepTransitionTime: 0,
         stepTransitionEasing: 'linear',
-        rotateParentInstantly: false
+        rotateParentInstantly: false,
+        touchElement: null
     };
 
     var Propeller = function (element, options) {
@@ -89,37 +90,37 @@
         this.listenersInstalled = true;
 
         if ('ontouchstart' in document.documentElement) {
-            this.element.addEventListener('touchstart', this.onRotationStart);
-            this.element.addEventListener('touchmove', this.onRotated);
-            this.element.addEventListener('touchend', this.onRotationStop);
-            this.element.addEventListener('touchcancel', this.onRotationStop);
-            this.element.addEventListener('dragstart', this.returnFalse);
+            this.touchElement.addEventListener('touchstart', this.onRotationStart);
+            this.touchElement.addEventListener('touchmove', this.onRotated);
+            this.touchElement.addEventListener('touchend', this.onRotationStop);
+            this.touchElement.addEventListener('touchcancel', this.onRotationStop);
+            this.touchElement.addEventListener('dragstart', this.returnFalse);
         } else {
-            this.element.addEventListener('mousedown', this.onRotationStart);
-            this.element.addEventListener('mousemove', this.onRotated);
-            this.element.addEventListener('mouseup', this.onRotationStop);
-            this.element.addEventListener('mouseleave', this.onRotationStop);
-            this.element.addEventListener('dragstart', this.returnFalse);
+            this.touchElement.addEventListener('mousedown', this.onRotationStart);
+            this.touchElement.addEventListener('mousemove', this.onRotated);
+            this.touchElement.addEventListener('mouseup', this.onRotationStop);
+            this.touchElement.addEventListener('mouseleave', this.onRotationStop);
+            this.touchElement.addEventListener('dragstart', this.returnFalse);
         }
 
-        this.element.ondragstart = this.returnFalse;
+        this.touchElement.ondragstart = this.returnFalse;
     }
 
     p.removeListeners = function () {
         this.listenersInstalled = false;
 
         if ('ontouchstart' in document.documentElement) {
-            this.element.removeEventListener('touchstart', this.onRotationStart);
-            this.element.removeEventListener('touchmove', this.onRotated);
-            this.element.removeEventListener('touchend', this.onRotationStop);
-            this.element.removeEventListener('touchcancel', this.onRotationStop);
-            this.element.removeEventListener('dragstart', this.returnFalse);
+            this.touchElement.removeEventListener('touchstart', this.onRotationStart);
+            this.touchElement.removeEventListener('touchmove', this.onRotated);
+            this.touchElement.removeEventListener('touchend', this.onRotationStop);
+            this.touchElement.removeEventListener('touchcancel', this.onRotationStop);
+            this.touchElement.removeEventListener('dragstart', this.returnFalse);
         } else {
-            this.element.removeEventListener('mousedown', this.onRotationStart);
-            this.element.removeEventListener('mousemove', this.onRotated);
-            this.element.removeEventListener('mouseup', this.onRotationStop);
-            this.element.removeEventListener('mouseleave', this.onRotationStop);
-            this.element.removeEventListener('dragstart', this.returnFalse);
+            this.touchElement.removeEventListener('mousedown', this.onRotationStart);
+            this.touchElement.removeEventListener('mousemove', this.onRotated);
+            this.touchElement.removeEventListener('mouseup', this.onRotationStop);
+            this.touchElement.removeEventListener('mouseleave', this.onRotationStop);
+            this.touchElement.removeEventListener('dragstart', this.returnFalse);
         }
     }
 
@@ -158,12 +159,12 @@
     }
 
     p.onRotationStop = function () {
-        this.active = false;
-
         //Execute onDragStop callback if stopped
-        if (this.onDragStop !== undefined) {
+        if (this.onDragStop !== undefined && this.active === true) {
             this.onDragStop();
         }
+
+        this.active = false;
     }
 
     p.onRotated = function (event) {
@@ -197,7 +198,6 @@
 
         if (Math.abs(this.lastAppliedAngle - this._angle) >= this.minimalAngleChange && this.transiting === false) {
             this.updateCSS();
-            this.lastAppliedAngle = this._angle;
 
             //Prevents new transition before old is completed
             this.blockTransition();
@@ -205,6 +205,9 @@
             if (this.onRotate !== undefined && typeof this.onRotate === 'function') {
                 this.onRotate.bind(this)();
             }
+            
+            this.lastAppliedAngle = this._angle;
+
         }
 
         window.requestAnimFrame(this.update);
@@ -305,6 +308,8 @@
 
     p.initOptions = function (options) {
         options = options || defaults;
+        
+        this.touchElement = document.querySelectorAll(options.touchElement)[0] || this.element;
 
         this.onRotate = options.onRotate || options.onrotate;
         this.onStop = options.onStop || options.onstop;
