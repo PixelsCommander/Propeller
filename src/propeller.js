@@ -172,10 +172,10 @@
             event.stopPropagation();
             event.preventDefault();
 
-            if (event.touches !== undefined && event.touches[0] !== undefined) {
+            if (event.targetTouches !== undefined && event.targetTouches[0] !== undefined) {
                 this.lastMouseEvent = {
-                    pageX: event.touches[0].pageX,
-                    pageY: event.touches[0].pageY
+                    pageX: event.targetTouches[0].pageX,
+                    pageY: event.targetTouches[0].pageY
                 }
             } else {
                 this.lastMouseEvent = {
@@ -205,7 +205,7 @@
             if (this.onRotate !== undefined && typeof this.onRotate === 'function') {
                 this.onRotate.bind(this)();
             }
-            
+
             this.lastAppliedAngle = this._angle;
 
         }
@@ -308,7 +308,7 @@
 
     p.initOptions = function (options) {
         options = options || defaults;
-        
+
         this.touchElement = document.querySelectorAll(options.touchElement)[0] || this.element;
 
         this.onRotate = options.onRotate || options.onrotate;
