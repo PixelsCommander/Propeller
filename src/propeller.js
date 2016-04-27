@@ -179,8 +179,8 @@
                 }
             } else {
                 this.lastMouseEvent = {
-                    pageX: event.pageX || event.clientX,
-                    pageY: event.pageY || event.clientY
+                    pageX: event.clientX || event.pageX,
+                    pageY: event.clientY || event.pageY
                 }
             }
         }
