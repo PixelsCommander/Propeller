@@ -10,6 +10,9 @@ JavaScript library to rotate elements by mouse. Supports inertia and stepwise ro
 
 ##Usage
 
+####Available on NPM
+    ```npm install propeller```
+
 ####Easy-to-use as jQuery plugin:
     $(nodeOrSelector).propeller(options);
 

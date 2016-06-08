@@ -278,7 +278,7 @@
         }
 
         //At this moment we have to use specific algorithm when CSS transition is enabled. Using same approach when transition is disabled lead to worse precision.
-        //TODO Develop universal algorithm to support transitions and allow good precision at once
+        //TODO Develop universal algorithm to support transitions and provide high precision at once
         if (this.stepTransitionTime !== defaults.stepTransitionTime) {
             this.speed = this.mouseDiff = this.differenceBetweenAngles(mouseDegrees, this.lastMouseAngle);
             this.virtualAngle = this.lastElementAngle + this.mouseDiff;
@@ -579,6 +579,10 @@ if (!Function.prototype.bind) {
         docHijack('getElementById');
         docHijack('createElement');
         addListen(doc.all);
+    }
+
+    if(typeof module === "object" && module.exports) {
+        module.exports = Propeller;
     }
 })(window, document);
 
