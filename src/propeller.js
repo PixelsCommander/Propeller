@@ -71,12 +71,15 @@
     var p = Propeller.prototype;
 
     p.initAngleGetterSetter = function () {
-        getterSetter(this, 'angle', function () {
-            return this._angle
-        }, function (value) {
-            this._angle = value;
-            this.virtualAngle = value;
-            this.updateCSS();
+        Object.defineProperty(this, 'angle', {
+            get: function () {
+                return this._angle;
+            },
+            set: function (value) {
+                this._angle = value;
+                this.virtualAngle = value;
+                this.updateCSS();
+            }
         });
     }
 
@@ -404,12 +407,6 @@
     p.getViewOffset = function (singleFrame) {
         var coords = {x: 0, y: 0};
 
-        if (Propeller.IEVersion !== false && Propeller.IEVersion < 9) {
-            coords.x = this.element.offsetLeft;
-            coords.y = this.element.offsetTop;
-            return coords;
-        }
-
         if (this.element)
             this.addOffset(this.element, coords, 'defaultView' in document ? document.defaultView : document.parentWindow);
 
@@ -496,8 +493,6 @@
         };
     }
 
-    var nav = navigator.userAgent.toLowerCase();
-    Propeller.IEVersion = (nav.indexOf('msie') != -1) ? parseInt(nav.split('msie')[1]) : false;
     Propeller.deg2radians = Math.PI * 2 / 360;
 
     w.Propeller = Propeller;
@@ -512,107 +507,3 @@ window.requestAnimFrame = (function () {
         window.setTimeout(callback, 1000 / 60);
     };
 })();
-
-//Function.bind polyfill
-if (!Function.prototype.bind) {
-    Function.prototype.bind = function (oThis) {
-        if (typeof this !== "function") {
-            // closest thing possible to the ECMAScript 5 internal IsCallable function
-            throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
-        }
-
-        var aArgs = Array.prototype.slice.call(arguments, 1),
-            fToBind = this,
-            fNOP = function () {
-            },
-            fBound = function () {
-                return fToBind.apply(this instanceof fNOP && oThis
-                        ? this
-                        : oThis,
-                    aArgs.concat(Array.prototype.slice.call(arguments)));
-            };
-
-        fNOP.prototype = this.prototype;
-        fBound.prototype = new fNOP();
-
-        return fBound;
-    };
-}
-
-//IE addEventListener polyfill
-(function (win, doc) {
-    if (win.addEventListener)return;		//No need to polyfill
-
-    function docHijack(p) {
-        var old = doc[p];
-        doc[p] = function (v) {
-            return addListen(old(v))
-        }
-    }
-
-    function addEvent(on, fn, self) {
-        return (self = this).attachEvent('on' + on, function (e) {
-            var e = e || win.event;
-            e.preventDefault = e.preventDefault || function () {
-                e.returnValue = false
-            }
-            e.stopPropagation = e.stopPropagation || function () {
-                e.cancelBubble = true
-            }
-            fn.call(self, e);
-        });
-    }
-
-    function addListen(obj, i) {
-        if (i = obj.length)while (i--)obj[i].addEventListener = addEvent;
-        else obj.addEventListener = addEvent;
-        return obj;
-    }
-
-    addListen([doc, win]);
-    if ('Element' in win)win.Element.prototype.addEventListener = addEvent;			//IE8
-    else {		//IE < 8
-        doc.attachEvent('onreadystatechange', function () {
-            addListen(doc.all)
-        });		//Make sure we also init at domReady
-        docHijack('getElementsByTagName');
-        docHijack('getElementById');
-        docHijack('createElement');
-        addListen(doc.all);
-    }
-
-    if(typeof module === "object" && module.exports) {
-        module.exports = Propeller;
-    }
-})(window, document);
-
-//IE getComputedStyle polyfill
-if (!window.getComputedStyle) {
-    window.getComputedStyle = function (el, pseudo) {
-        this.el = el;
-        this.getPropertyValue = function (prop) {
-            var re = /(\-([a-z]){1})/g;
-            if (prop == 'float') prop = 'styleFloat';
-            if (re.test(prop)) {
-                prop = prop.replace(re, function () {
-                    return arguments[2].toUpperCase();
-                });
-            }
-            return el.currentStyle[prop] ? el.currentStyle[prop] : null;
-        }
-        return this;
-    }
-}
-
-function getterSetter(variableParent, variableName, getterFunction, setterFunction) {
-    if (Object.defineProperty) {
-        Object.defineProperty(variableParent, variableName, {
-            get: getterFunction,
-            set: setterFunction
-        });
-    }
-    else if (document.__defineGetter__) {
-        variableParent.__defineGetter__(variableName, getterFunction);
-        variableParent.__defineSetter__(variableName, setterFunction);
-    }
-}
