@@ -30,6 +30,7 @@
         step: 0,
         stepTransitionTime: 0,
         stepTransitionEasing: 'linear',
+        onMouseLeave: true,
         rotateParentInstantly: false,
         touchElement: null
     };
@@ -99,7 +100,12 @@
             this.touchElement.addEventListener('mousedown', this.onRotationStart);
             this.touchElement.addEventListener('mousemove', this.onRotated);
             this.touchElement.addEventListener('mouseup', this.onRotationStop);
-            this.touchElement.addEventListener('mouseleave', this.onRotationStop);
+            if (this.onMouseLeave) {
+				this.touchElement.addEventListener('mouseleave.propeller', this.onRotationStop);
+				this.touchElement.addEventListener('mousemove', this.onRotated);
+			} else {
+				$(document).on('mousemove.propeller', this.onRotated);
+			}
             this.touchElement.addEventListener('dragstart', this.returnFalse);
         }
 
@@ -119,7 +125,11 @@
             this.touchElement.removeEventListener('mousedown', this.onRotationStart);
             this.touchElement.removeEventListener('mousemove', this.onRotated);
             this.touchElement.removeEventListener('mouseup', this.onRotationStop);
-            this.touchElement.removeEventListener('mouseleave', this.onRotationStop);
+            if (this.onMouseLeave) {
+            	this.touchElement.removeEventListener('mousemove', this.onRotationStop);
+            } else {
+				$(document).off('mousemove.propeller', this.onRotationStop);
+			}
             this.touchElement.removeEventListener('dragstart', this.returnFalse);
         }
     }
@@ -315,6 +325,7 @@
         this.onStop = options.onStop || options.onstop;
         this.onDragStop = options.onDragStop || options.ondragstop;
         this.onDragStart = options.onDragStart || options.ondragstart;
+        this.onMouseLeave = options.onMouseLeave || options.onMouseLeave;
 
         this.step = options.step || defaults.step;
         this.stepTransitionTime = options.stepTransitionTime || defaults.stepTransitionTime;
