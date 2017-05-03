@@ -68,7 +68,15 @@
 </div>
 <script src="dist/propeller.min.js"></script>
 <script>
-    new Propeller(document.getElementById('turbine'), {inertia: 0.99});
+    new Propeller(document.getElementById('turbine'), {
+        inertia: 0.99,
+        onDragStop: function() {
+            console.log('stop');
+        },
+        onDragStart: function () {
+            console.log('start');
+        }
+    });
 
     function showLibraryInfo() {
         if (window.libInfoShown !== true) {
