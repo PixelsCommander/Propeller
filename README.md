@@ -4,6 +4,8 @@ JavaScript library to rotate elements by mouse. Supports inertia and stepwise ro
 
 [Lot of demos](http://pixelscommander.com/polygon/propeller/example/jquerygrid.html)
 
+[Spinner game drawn by my doughter](http://pixelscommander.com/polygon/spinner/)
+
 [Project page](http://pixelscommander.com/polygon/propeller/)
 
 ![Propeller.js](http://pixelscommander.com/polygon/propeller/example/demo.gif "JavaScript library to rotate HTML elements by mouse or touch gestures")
