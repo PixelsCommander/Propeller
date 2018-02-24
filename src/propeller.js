@@ -147,7 +147,6 @@
 
     p.onRotationStart = function (event) {
         //Initializes coordinates if object was moved
-        this.initCoordinates();
         this.initDrag();
         this.active = true;
 
@@ -177,13 +176,13 @@
 
             if (event.targetTouches !== undefined && event.targetTouches[0] !== undefined) {
                 this.lastMouseEvent = {
-                    pageX: event.targetTouches[0].pageX,
-                    pageY: event.targetTouches[0].pageY
+                    x: event.targetTouches[0].clientX,
+                    y: event.targetTouches[0].clientY
                 }
             } else {
                 this.lastMouseEvent = {
-                    pageX: event.pageX || event.clientX,
-                    pageY: event.pageY || event.clientY
+                    x: event.clientX,
+                    y: event.clientY
                 }
             }
         }
@@ -268,12 +267,18 @@
         }
     }
 
-    p.updateAngleToMouse = function (event) {
-        var xDiff = event.pageX - this.cx;
-        var yDiff = event.pageY - this.cy;
+    p.updateAngleToMouse = function (newPoint) {
+        var rect = this.element.getBoundingClientRect();
+        var center = {
+            x: rect.left + (rect.width / 2),
+            y: rect.top + (rect.height / 2),
+        };
 
-        var mouseRadians = Math.atan2(xDiff, yDiff);
-        var mouseDegrees = mouseRadians * (180 / Math.PI * -1) + 180;
+
+        // atan2 gives values between [-180, 180] deg
+        // offset the angle by 180 degrees so that it's 0 to 360 deg
+        var newMouseAngle = Math.atan2(newPoint.y - center.y, newPoint.x - center.x) + Math.PI;
+        var mouseDegrees = newMouseAngle * Propeller.radToDegMulti;
 
         if (this.lastMouseAngle === undefined) {
             this.lastElementAngle = this.virtualAngle;
@@ -294,12 +299,6 @@
             var newAngle = this.virtualAngle;
             this.speed = this.differenceBetweenAngles(newAngle, oldAngle);
         }
-    }
-
-    p.initCoordinates = function () {
-        var elementOffset = this.getViewOffset();
-        this.cx = elementOffset.x + (this.element.offsetWidth / 2);
-        this.cy = elementOffset.y + (this.element.offsetHeight / 2);
     }
 
     p.initDrag = function () {
@@ -392,7 +391,6 @@
         this.element.style[Propeller.cssPrefix + 'transform'] = 'rotate(' + this._angle + 'deg) ' + this.accelerationPostfix;
     }
 
-
     p.blockTransition = function () {
         if (this.stepTransitionTime !== defaults.stepTransitionTime) {
             var self = this;
@@ -400,76 +398,6 @@
                 self.transiting = false;
             }, this.stepTransitionTime);
             this.transiting = true;
-        }
-    }
-
-    //Calculating pageX, pageY for elements with offset parents
-    p.getViewOffset = function (singleFrame) {
-        var coords = {x: 0, y: 0};
-
-        if (this.element)
-            this.addOffset(this.element, coords, 'defaultView' in document ? document.defaultView : document.parentWindow);
-
-        return coords;
-    }
-
-    p.addOffset = function (node, coords, view) {
-        var p = node.offsetParent;
-        coords.x += node.offsetLeft - (p ? p.scrollLeft : 0);
-        coords.y += node.offsetTop - (p ? p.scrollTop : 0);
-
-        if (p) {
-            if (p.nodeType == 1) {
-                var parentStyle = view.getComputedStyle(p, '');
-                if (parentStyle.position != 'static') {
-                    coords.x += parseInt(parentStyle.borderLeftWidth);
-                    coords.y += parseInt(parentStyle.borderTopWidth);
-
-                    if (p.localName.toLowerCase() == 'table') {
-                        coords.x += parseInt(parentStyle.paddingLeft);
-                        coords.y += parseInt(parentStyle.paddingTop);
-                    }
-                    else if (p.localName.toLowerCase() == 'body') {
-                        var style = view.getComputedStyle(node, '');
-                        coords.x += parseInt(style.marginLeft);
-                        coords.y += parseInt(style.marginTop);
-                    }
-                }
-                else if (p.localName.toLowerCase() == 'body') {
-                    coords.x += parseInt(parentStyle.borderLeftWidth);
-                    coords.y += parseInt(parentStyle.borderTopWidth);
-                }
-
-                var parent = node.parentNode;
-                while (p != parent) {
-                    coords.x -= parent.scrollLeft;
-                    coords.y -= parent.scrollTop;
-                    parent = parent.parentNode;
-                }
-                this.addOffset(p, coords, view);
-            }
-        }
-        else {
-            if (node.localName.toLowerCase() == 'body') {
-                var style = view.getComputedStyle(node, '');
-                coords.x += parseInt(style.borderLeftWidth);
-                coords.y += parseInt(style.borderTopWidth);
-
-                var htmlStyle = view.getComputedStyle(node.parentNode, '');
-                coords.x += parseInt(htmlStyle.paddingLeft);
-                coords.y += parseInt(htmlStyle.paddingTop);
-                coords.x += parseInt(htmlStyle.marginLeft);
-                coords.y += parseInt(htmlStyle.marginTop);
-            }
-
-            if (node.scrollLeft)
-                coords.x += node.scrollLeft;
-            if (node.scrollTop)
-                coords.y += node.scrollTop;
-
-            var win = node.ownerDocument.defaultView;
-            if (win && (win.frameElement))
-                this.addOffset(win.frameElement, coords, win);
         }
     }
 
@@ -494,6 +422,7 @@
     }
 
     Propeller.deg2radians = Math.PI * 2 / 360;
+    Propeller.radToDegMulti = 57.29577951308232; // rad * 180 / Math.PI
 
     w.Propeller = Propeller;
 })(window);
